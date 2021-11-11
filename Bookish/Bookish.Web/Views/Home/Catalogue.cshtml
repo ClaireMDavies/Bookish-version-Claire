@@ -1,0 +1,58 @@
+﻿@using Bookish.DataAccess
+@model IEnumerable<Book>
+@{
+    ViewBag.Title = "Catalogue";
+}
+@if (IsPost)
+{
+
+    BookRepository bookrepo = new BookRepository();
+    int copy_id = int.Parse(Request.Form["copy_id"]);
+    bookrepo.ReturnCopy(copy_id);
+}
+
+<div class="jumbotron border border-secondary">
+    <h1>Catalogue</h1>
+    <h2>@User.Identity.Name</h2>
+    <form method="get" class="d-flex">
+        <input class="form-control me-2" type="search" name="query" value="@Request.Form["title"]" required style="border: 3px inset gray"/>
+        <button type="submit" class="btn btn-default" style=" margin-top: 5px">Search</button>
+    </form>
+</div>
+
+<table class="table table-dark table-bordered">
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Author</th>
+    </tr>
+    @foreach (var book in Model)
+    {
+        BookRepository bookrepo = new BookRepository();
+        <tr>
+            <td>@book.id</td>
+            <td>@Html.ActionLink(book.title, "Book", new { id = book.id })</td>
+            <td>@book.author</td>
+
+        </tr>
+        string user_name = User.Identity.Name;
+        if (user_name != "")
+        {
+            int user_id = bookrepo.GetUseridByName(user_name);
+            foreach (var copy in bookrepo.GetCopiesofBookAssignedToUser(book.id, user_id))
+            {
+                <tr>
+                    <td>Your owned copy</td>
+                    <td>Is due back on @copy.due_date.ToString("dd/MM/yyyy")<td>
+                    <td>
+                        <form method="post">
+                            <input type="hidden" name="copy_id" value="@copy.id" />
+                            <button type="submit" class="btn btn-success btn-sm">return</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    }
+</table>
+

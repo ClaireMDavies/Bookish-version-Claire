@@ -1,0 +1,42 @@
+﻿
+@using Bookish.DataAccess
+@using System.Web
+@{ ViewBag.Title = "NewBook"; }
+@{              
+    var title = "";
+    var author = "";
+    var copies = "";
+
+    if (IsPost)
+    {
+        title = Request.Form["title"];
+        author = Request.Form["author"];
+        copies = Request.Form["copies"];
+
+        BookRepository bookrepo = new BookRepository();
+        int id = bookrepo.CreateBook(title, author);
+        bookrepo.CreateCopies(id, int.Parse(copies));
+    }
+}
+
+<div class="jumbotron">
+    <h2>New Book</h2>
+
+</div>
+
+
+<form method="post">
+    <div class="form-group">
+        <label for="bookNameInput">Book Name</label>
+        <input type="text" class="form-control" id="bookNameInput" placeholder="Please insert a name" name="title" required value="@Request.Form["title"]" />
+    </div>
+    <div class="form-group">
+        <label for="bookAuthorInput">Book Author</label>
+        <input type="text" class="form-control" id="bookAuthorInput" placeholder="Please insert an author" name="author" required value="@Request.Form["author"]" />
+    </div>
+    <div class="form-group">
+        <label for="bookCopiesInput">Book Copies</label>
+        <input type="number" class="form-control" id="bookCopiesInput" min="1" max="5" name="copies" required value="@Request.Form["copies"]" />
+    </div>
+    <button type="submit" class="btn btn-success">Submit</button>
+</form>
